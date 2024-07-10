@@ -1,0 +1,56 @@
+import React, { useState, useEffect } from 'react';
+import './App.css';
+import { getTasks, addTask } from './ipc';
+
+function App() {
+    const [tasks, setTasks] = useState([]);
+    const [task, setTask] = useState('');
+
+    useEffect(() => {
+        getTasks();
+    }, []);
+
+    useEffect(() => {
+        const handleTasks = (event, tasks) => {
+            setTasks(tasks);
+        };
+
+        window.require('electron').ipcRenderer.on('tasks', handleTasks);
+
+        return () => {
+            window.require('electron').ipcRenderer.removeListener('tasks', handleTasks);
+        };
+    }, []);
+
+    const handleAddTask = () => {
+        if (task) {
+            addTask({ text: task, completed: false });
+            setTask('');
+        }
+    };
+
+    return (
+        <div className="App">
+            <header className="App-header">
+                <h1>To-Do List</h1>
+                <div>
+                    <input
+                        type="text"
+                        value={task}
+                        onChange={(e) => setTask(e.target.value)}
+                    />
+                    <button onClick={handleAddTask}>Add Task</button>
+                </div>
+                <ul>
+                    {tasks.map((task, index) => (
+                        <li key={index} style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
+                            {task.text}
+                        </li>
+                    ))}
+                </ul>
+            </header>
+        </div>
+    );
+}
+
+export default App;
