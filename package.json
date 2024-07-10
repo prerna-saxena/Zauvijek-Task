@@ -1,0 +1,23 @@
+Build and Package the App
+Add scripts to package.json for building and packaging:
+
+"scripts": {
+  "start": "concurrently \"vite\" \"electron .\"",
+  "build": "vite build",
+  "electron-pack": "electron-builder"
+},
+"main": "public/electron.js",
+"build": {
+  "appId": "com.myapp.todo",
+  "mac": {
+    "category": "public.app-category.productivity"
+  },
+  "win": {
+    "target": "nsis"
+  },
+  "files": [
+    "dist/**/*",
+    "public/electron.js",
+    "public/preload.js"
+  ]
+}
