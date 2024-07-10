@@ -1,0 +1,14 @@
+Backend:
+
+To implement a To-Do application with CRUD operations using SQLite in Visual Studio Code, you'll need to:
+
+Set up SQLite in your project.
+Create a database schema for storing tasks.
+Implement CRUD operations (Create, Read, Update, Delete).
+
+ Set up SQLite in your project
+
+create a new Python project in Visual Studio Code.
+
+Create a database schema
+Create a new Python file named database.py and add the following code to set up the database and create a table for tasks:
