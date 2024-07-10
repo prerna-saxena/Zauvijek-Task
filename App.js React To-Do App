@@ -1,0 +1,59 @@
+Create a simple To-Do component:
+
+Replace the content of src/App.js with the following code:
+
+import React, { useState } from 'react';
+import './App.css';
+
+function App() {
+    const [tasks, setTasks] = useState([]);
+    const [task, setTask] = useState('');
+
+    const addTask = () => {
+        if (task) {
+            setTasks([...tasks, { text: task, completed: false }]);
+            setTask('');
+        }
+    };
+
+    const toggleTaskCompletion = index => {
+        const newTasks = [...tasks];
+        newTasks[index].completed = !newTasks[index].completed;
+        setTasks(newTasks);
+    };
+
+    const deleteTask = index => {
+        const newTasks = [...tasks];
+        newTasks.splice(index, 1);
+        setTasks(newTasks);
+    };
+
+    return (
+        <div className="App">
+            <header className="App-header">
+                <h1>To-Do List</h1>
+                <div>
+                    <input
+                        type="text"
+                        value={task}
+                        onChange={(e) => setTask(e.target.value)}
+                    />
+                    <button onClick={addTask}>Add Task</button>
+                </div>
+                <ul>
+                    {tasks.map((task, index) => (
+                        <li key={index} style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
+                            {task.text}
+                            <button onClick={() => toggleTaskCompletion(index)}>
+                                {task.completed ? 'Undo' : 'Complete'}
+                            </button>
+                            <button onClick={() => deleteTask(index)}>Delete</button>
+                        </li>
+                    ))}
+                </ul>
+            </header>
+        </div>
+    );
+}
+
+export default App;
