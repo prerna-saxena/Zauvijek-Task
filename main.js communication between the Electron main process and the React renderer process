@@ -1,0 +1,70 @@
+communication between the Electron main process and the React renderer process
+
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
+const isDev = require('electron-is-dev');
+
+let mainWindow;
+
+function createWindow() {
+    mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+            enableRemoteModule: true
+        },
+    });
+
+    mainWindow.loadURL(
+        isDev
+            ? 'http://localhost:3000'
+            : `file://${path.join(__dirname, '../build/index.html')}`
+    );
+
+    if (isDev) {
+        mainWindow.webContents.openDevTools();
+    }
+}
+
+app.on('ready', createWindow);
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
+
+app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+    }
+});
+
+// IPC handlers
+ipcMain.on('get-tasks', (event) => {
+    // Fetch tasks from your data store (e.g., SQLite) and send them to the renderer process
+    const tasks = getTasksFromDatabase(); // Assume this function fetches tasks
+    event.sender.send('tasks', tasks);
+});
+
+ipcMain.on('add-task', (event, task) => {
+    // Add the new task to your data store (e.g., SQLite)
+    addTaskToDatabase(task); // Assume this function adds a task
+    // Optionally, send an acknowledgment or updated tasks list back to the renderer process
+    event.sender.send('task-added', task);
+});
+
+function getTasksFromDatabase() {
+    // Mock function - replace with actual database fetch
+    return [
+        { id: 1, text: 'Task 1', completed: false },
+        { id: 2, text: 'Task 2', completed: true },
+    ];
+}
+
+function addTaskToDatabase(task) {
+    // Mock function - replace with actual database insertion
+    console.log('Task added:', task);
+}
