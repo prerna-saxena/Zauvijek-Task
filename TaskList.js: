@@ -1,0 +1,49 @@
+Create React Components
+Create src/components/TaskList.js
+
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setTasks, deleteTask, updateTask } from '../store';
+
+const TaskList = () => {
+  const tasks = useSelector((state) => state.tasks);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    window.electron.send('get-tasks');
+    window.electron.receive('get-tasks-reply', (tasks) => {
+      dispatch(setTasks(tasks));
+    });
+  }, [dispatch]);
+
+  const handleDelete = (id) => {
+    window.electron.send('delete-task', id);
+    window.electron.receive('delete-task-reply', (deletedId) => {
+      dispatch(deleteTask(deletedId));
+    });
+  };
+
+  const handleToggleComplete = (task) => {
+    const updatedTask = { ...task, completed: task.completed ? 0 : 1 };
+    window.electron.send('update-task', updatedTask);
+    window.electron.receive('update-task-reply', (updatedTask) => {
+      dispatch(updateTask(updatedTask));
+    });
+  };
+
+  return (
+    <ul>
+      {tasks.map((task) => (
+        <li key={task.id}>
+          <span style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
+            {task.title}
+          </span>
+          <button onClick={() => handleToggleComplete(task)}>Toggle Complete</button>
+          <button onClick={() => handleDelete(task.id)}>Delete</button>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+export default TaskList;
